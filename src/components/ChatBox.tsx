@@ -1,5 +1,6 @@
 import { FaArrowCircleUp } from "react-icons/fa";
 import { TMessage } from "../types";
+import { useEffect, useState } from "react";
 
 type ChatBoxProps = {
   chat: TMessage[];
@@ -8,14 +9,21 @@ type ChatBoxProps = {
 
 const ChatBox = ({ chat, setChat }: ChatBoxProps) => {
   const disabledSubmitColor = "#676767";
+  const [chatBoxRowSize, setChatBoxRowSize] = useState<number | undefined>();
+
+  useEffect(() => {
+    const textarea = document.getElementById("msg") as HTMLTextAreaElement;
+    textarea.rows = 1;
+    setChatBoxRowSize(textarea.scrollHeight);
+  }, []);
 
   const onInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const textarea = e.currentTarget;
+    console.log(chatBoxRowSize);
     textarea.rows = 1;
-    textarea.style.height = "auto";
-    // console.log(textarea.scrollHeight);
-    const numRows = textarea.scrollHeight / 24;
+    const numRows = chatBoxRowSize ? textarea.scrollHeight / chatBoxRowSize : 1;
     textarea.rows = numRows < 4 ? numRows : 4;
+    // console.log(textarea.scrollHeight, " ", textarea.rows);
 
     const submitButton = document.getElementById(
       "submit-button"
@@ -28,9 +36,9 @@ const ChatBox = ({ chat, setChat }: ChatBoxProps) => {
   const handleSubmit = () => {
     // TODO: SEVERE ISSUES WHEN EXTENSION MODE
     // e.preventDefault();
-    const doc = document.getElementById("msg") as HTMLTextAreaElement;
-    if (doc.value.length > 0) {
-      const msg = doc.value;
+    const textarea = document.getElementById("msg") as HTMLTextAreaElement;
+    if (textarea.value.length > 0) {
+      const msg = textarea.value;
       // console.log(msg);
       setChat([
         ...chat,
@@ -38,9 +46,9 @@ const ChatBox = ({ chat, setChat }: ChatBoxProps) => {
         { message: msg, isUser: false },
       ]);
       // console.log(chat);
-      doc.value = "";
-      doc.style.height = "auto";
-      doc.rows = 1;
+      textarea.value = "";
+      textarea.style.height = "auto";
+      textarea.rows = 1;
     }
   };
 
@@ -67,15 +75,19 @@ const ChatBox = ({ chat, setChat }: ChatBoxProps) => {
         <button
           type="submit"
           onClick={handleSubmit}
-          className="mb-[7px] rounded-full"
+          className="rounded-full"
+          style={{
+            marginBottom: `${
+              (16 + (chatBoxRowSize ? chatBoxRowSize : 0)) * 0.15
+            }px`,
+          }}
         >
           <FaArrowCircleUp
             color={disabledSubmitColor}
             id="submit-button"
-            size={26}
+            size={(16 + (chatBoxRowSize ? chatBoxRowSize : 0)) * 0.7}
           />
         </button>
-        {/* TODO: CENTER THE BUTTON ON START!!! */}
       </div>
     </>
   );
