@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name": "SidePanelEinstein",
+    "version": "1.0",
+    "description": "opens side panel einstein",
+    "minimum_chrome_version": "116",
+    "background": {
+      "service_worker": "service-worker.js"
+    },
+    "side_panel": {
+      "default_path": "index.html"
+    },
+    "permissions": ["sidePanel", "contextMenus"]
+  }
+  
