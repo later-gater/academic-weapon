@@ -1,4 +1,4 @@
 export type TMessage = {
-    message: string;
-    isUser: boolean;
+    parts: {text: string}[];
+    role: string;
 };
