@@ -1,6 +1,6 @@
 import TypeBox from "./TypeBox";
 import { FaArrowCircleUp } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { TMessage } from "../types";
 
 type chatBoxProps = {
@@ -11,17 +11,23 @@ type chatBoxProps = {
 const ChatBox = ({ chatHistory, setChatHistory }: chatBoxProps) => {
   const disabledSubmitColor = "#676767";
   const [typeBoxRowSize, setTypeBoxRowSize] = useState<number | undefined>();
+  const typeBoxRef = useRef(null);
+  const submitButtonRef = useRef(null);
 
   const handleSubmit = () => {
-    const textarea = document.getElementById("msg") as HTMLTextAreaElement;
-    if (textarea.value.length > 0) {
-      const msg = textarea.value;
-      // console.log(msg);
-      setChatHistory([...chatHistory, { parts: [{ text: msg }], role: "user"}]);
-      // console.log(chat);
-      textarea.value = "";
-      textarea.style.height = "auto";
-      textarea.rows = 1;
+    if (typeBoxRef.current) {
+      const textarea = typeBoxRef.current as HTMLTextAreaElement;
+      if (textarea.value.length > 0) {
+        const msg = textarea.value;
+        // console.log(msg);
+        setChatHistory([
+          ...chatHistory,
+          { parts: [{ text: msg }], role: "user" },
+        ]);
+        // console.log(chat);
+        textarea.value = "";
+        textarea.rows = 1;
+      }
     }
   };
   return (
@@ -31,9 +37,12 @@ const ChatBox = ({ chatHistory, setChatHistory }: chatBoxProps) => {
         typeBoxRowSize={typeBoxRowSize}
         setTypeBoxRowSize={setTypeBoxRowSize}
         disabledSubmitColor={disabledSubmitColor}
+        typeBoxRef={typeBoxRef}
+        submitButtonRef={submitButtonRef}
       />
       <button
         type="submit"
+        ref={submitButtonRef}
         onClick={handleSubmit}
         className="rounded-full"
         style={{
@@ -47,6 +56,7 @@ const ChatBox = ({ chatHistory, setChatHistory }: chatBoxProps) => {
           id="submit-button"
           size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
         />
+        {/* TODO: if disabled, don't make mouse hand onHover */}
       </button>
     </div>
   );

@@ -5,6 +5,8 @@ type typeBoxProps = {
   typeBoxRowSize: number | undefined;
   setTypeBoxRowSize: (size: number | undefined) => void;
   disabledSubmitColor: string;
+  typeBoxRef: React.RefObject<HTMLTextAreaElement>;
+  submitButtonRef: React.RefObject<HTMLButtonElement>;
 };
 
 const TypeBox = ({
@@ -12,25 +14,25 @@ const TypeBox = ({
   typeBoxRowSize,
   setTypeBoxRowSize,
   disabledSubmitColor,
+  typeBoxRef,
+  submitButtonRef,
 }: typeBoxProps) => {
-  
   useEffect(() => {
-    const textarea = document.getElementById("msg") as HTMLTextAreaElement;
-    textarea.rows = 1;
-    setTypeBoxRowSize(textarea.scrollHeight);
+    if (typeBoxRef.current) {
+      typeBoxRef.current.rows = 1;
+      setTypeBoxRowSize(typeBoxRef.current.clientHeight);
+    }
   }, []);
 
   const onInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const textarea = e.currentTarget;
-    console.log(typeBoxRowSize);
+    // console.log(typeBoxRowSize);
     textarea.rows = 1;
     const numRows = typeBoxRowSize ? textarea.scrollHeight / typeBoxRowSize : 1;
     textarea.rows = numRows < 4 ? numRows : 4;
     // console.log(textarea.scrollHeight, " ", textarea.rows);
 
-    const submitButton = document.getElementById(
-      "submit-button"
-    ) as HTMLButtonElement;
+    const submitButton = submitButtonRef.current!.children[0] as HTMLElement;
     textarea.textLength > 0
       ? (submitButton.style.color = "white")
       : (submitButton.style.color = disabledSubmitColor);
@@ -40,16 +42,17 @@ const TypeBox = ({
     if (e.key === "Enter") {
       e.preventDefault();
       handleSubmit();
+      onInput(e);
     }
   };
 
   return (
     <>
       <textarea
-        id="msg"
+        ref={typeBoxRef}
         name="msg"
         placeholder="Message Einstein"
-        className="flex-grow my-2 overflow-y-auto no-scrollbar resize-none bg-transparent focus:outline-none text-white"
+        className="flex-grow my-2 no-scrollbar resize-none bg-transparent focus:outline-none text-white"
         onInput={onInput}
         onKeyDown={overrideEnter}
         rows={1}

@@ -34,7 +34,8 @@ const Chat = ({
           chatHistory.push(response);
           for await (const chunk of result.stream) {
             const scroll =
-              scrollRef.current.scrollTop === scrollRef.current.scrollHeight - scrollRef.current.clientHeight
+              scrollRef.current.scrollTop ===
+              scrollRef.current.scrollHeight - scrollRef.current.clientHeight
                 ? true
                 : false;
             const chunkText = chunk.text();
@@ -53,7 +54,7 @@ const Chat = ({
   return (
     <div
       ref={scrollRef}
-      className="w-full flex h-full flex-col px-5 py-2 overflow-y-scroll text-white scroll-smooth"
+      className="w-full flex h-full flex-col px-5 py-2 overflow-y-auto text-white scroll-smooth"
     >
       {/* TODO: MAKE PRETTY SCROLLBAR */}
       {chatHistory.map((msg, index) => {
@@ -66,7 +67,11 @@ const Chat = ({
                 : "self-start max-w-[90%]"
             } px-3 py-1 rounded-3xl m-1  break-words`}
           >
-            {msg.parts.map((obj) => obj.text).join("")}
+            {
+              msg.parts
+                .map((obj) => obj.text)
+                .join("") /* TODO: MARKUP -> TEXT (DOES NOT CONSIDER \n RN) */
+            }
           </div>
         );
       })}
