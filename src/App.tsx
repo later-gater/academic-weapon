@@ -1,34 +1,67 @@
 import ChatBox from "./components/ChatBox";
 import Chat from "./components/Chat";
 import Header from "./components/Header";
-import { useState } from "react";
-import { ChatSession, GoogleGenerativeAI } from "@google/generative-ai";
+import { useEffect, useState } from "react";
+import {
+  ChatSession,
+  GoogleGenerativeAI,
+  HarmBlockThreshold,
+  HarmCategory,
+} from "@google/generative-ai";
 import { TMessage } from "./types";
 
 const App = () => {
+  const [canSubmit, setCanSubmit] = useState(true);
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // TODO: SET UP SYSTEM INSTRUCTIONS HERE https://github.com/google-gemini/cookbook/blob/main/quickstarts/System_instructions.ipynb
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+  ];
 
-  const [chatBot] = useState<ChatSession>(
-    model.startChat({
-      // history: [
-      //   {
-      //     role: "user",
-      //     parts: [{ text: "Hello, I have 2 dogs in my house." }],
-      //   },
-      //   {
-      //     role: "model",
-      //     parts: [
-      //       { text: "Great to meet you. What would you like to know?" },
-      //     ],
-      //   },
-      // ],
-      generationConfig: {
-        maxOutputTokens: 1000,
-      },
-    })
-  );
+  const generationConfig = {
+    maxOutputTokens: 1000,
+    temperature: 1,
+  };
+
+  const [chatBot, setChatBot] = useState<ChatSession>(model.startChat());
+  const [initialText, setInitialText] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const { openMethod, selectionText, pageContent } =
+        await chrome.storage.local.get([
+          "openMethod",
+          "selectionText",
+          "pageContent",
+        ]);
+      setChatBot(
+        model.startChat({
+          history: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text:
+                    openMethod === "consult-context"
+                      ? `In the future of this conversation, contextualize everything from the following website: \n ${pageContent[0].result}`
+                      : "Hello!",
+                },
+              ],
+            },
+          ],
+          generationConfig: generationConfig,
+          safetySettings: safetySettings,
+        })
+      );
+      setInitialText(selectionText);
+    })();
+  }, []);
+
   const [chatHistory, setChatHistory] = useState<TMessage[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // const logDev = () => {
   // };
@@ -38,9 +71,21 @@ const App = () => {
       <Header />
       {/* <button onClick={logDev}>DEV</button> */}
       <div className="w-full h-full bg-secondary flex flex-col justify-stretch items-center overflow-clip">
-        <Chat chatHistory={chatHistory ? chatHistory : []} chatBot={chatBot} />
+        <Chat
+          chatHistory={chatHistory ? chatHistory : []}
+          chatBot={chatBot}
+          setCanSubmit={setCanSubmit}
+          setLoading={setLoading}
+          loading={loading}
+        />
         <div className="w-full">
-          <ChatBox setChatHistory={setChatHistory} chatHistory={chatHistory} />
+          <ChatBox
+            setChatHistory={setChatHistory}
+            initialText={initialText}
+            chatHistory={chatHistory}
+            canSubmit={canSubmit}
+            loading={loading}
+          />
         </div>
       </div>
     </div>

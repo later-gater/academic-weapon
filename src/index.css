@@ -15,3 +15,17 @@
 
 }
 
+@keyframes loadingAnimation {
+    0%, 100% {
+        transform: scale(1);
+    }
+    20%, 80% {
+        transform: scale(1.2);
+    }
+    40%, 60% {
+        transform: scale(1.4);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+}

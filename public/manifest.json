@@ -5,7 +5,8 @@
     "description": "opens side panel einstein",
     "minimum_chrome_version": "116",
     "background": {
-      "service_worker": "service-worker.js"
+      "service_worker": "service-worker.js",
+      "type": "module"
     },
     "side_panel": {
       "default_path": "index.html"
@@ -16,7 +17,7 @@
       "48": "icon32.png",
       "128": "icon32.png"
     },
-    "permissions": ["sidePanel", "contextMenus", "scripting"],
+    "permissions": ["sidePanel", "contextMenus", "scripting", "storage", "activeTab"],
     "action": {  },
     "host_permissions": [
         "http://*/*",

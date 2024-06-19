@@ -1,16 +1,68 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { SiGooglegemini } from "react-icons/si";
 import { TMessage } from "../types";
 import { ChatSession } from "@google/generative-ai";
+import { sendPrompt } from "../assets/Gemini";
+import Markdown from "react-markdown";
+import { IconContext } from "react-icons";
+
+type chatProps = {
+  chatHistory: TMessage[];
+  chatBot: ChatSession;
+  setCanSubmit: (canSubmit: boolean) => void;
+  setLoading: (loading: boolean) => void;
+  loading: boolean;
+};
 
 const Chat = ({
   chatHistory,
   chatBot,
-}: {
-  chatHistory: TMessage[];
-  chatBot: ChatSession;
-}) => {
-  const lastMessageRef = useRef<HTMLDivElement>(null);
+  setCanSubmit,
+  setLoading,
+  loading,
+}: chatProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrolling, setScrolling] = useState(true);
+
+  const onResize = new ResizeObserver(() => {
+    if (scrolling) {
+      scrollRef.current!.scrollTop =
+        scrollRef.current!.scrollHeight - scrollRef.current!.clientHeight;
+    }
+  });
+
+  for (const child of scrollRef.current?.children || []) {
+    onResize.observe(child);
+  }
+
+  useEffect(() => {
+    // Define the scroll event handler
+    const handleScroll = () => {
+      if (
+        scrollRef.current &&
+        scrollRef.current.scrollTop ===
+          scrollRef.current.scrollHeight - scrollRef.current.clientHeight
+      ) {
+        setScrolling(true);
+      } else {
+        setScrolling(false);
+      }
+    };
+
+    // Add the event listener to the scrollRef.current element
+    const scrollElement = scrollRef.current;
+    if (scrollElement) {
+      scrollElement.addEventListener("scroll", handleScroll);
+    }
+
+    // Clean up function to remove the event listener
+    return () => {
+      if (scrollElement) {
+        scrollElement.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+  //TODO: SLOWLY ADD NEW TEXT FROM RESPONSE.
 
   useEffect(() => {
     //respond to chat message
@@ -18,34 +70,20 @@ const Chat = ({
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
-      if (
-        chatHistory.length > 0 &&
-        lastMessageRef.current &&
-        scrollRef.current
-      ) {
+      if (chatHistory.length > 0 && scrollRef.current) {
         const prompt = chatHistory[chatHistory.length - 1];
         if (prompt.role === "user") {
-          lastMessageRef.current.textContent = "";
-          const result = await chatBot.sendMessageStream(prompt.parts[0].text);
-          let response: TMessage = {
-            parts: [],
-            role: "model",
-          };
-          chatHistory.push(response);
-          for await (const chunk of result.stream) {
-            const scroll =
-              scrollRef.current.scrollTop ===
-              scrollRef.current.scrollHeight - scrollRef.current.clientHeight
-                ? true
-                : false;
-            const chunkText = chunk.text();
-            response.parts = [...response.parts, { text: chunkText }];
-            lastMessageRef.current.textContent += chunkText;
-            if (scroll) {
-              scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-            }
+          setCanSubmit(false);
+          setLoading(true);
+          let reply: string;
+          if (prompt.parts[0].prompt) {
+            reply = await sendPrompt(prompt.parts[0].prompt, chatBot);
+          } else {
+            reply = await sendPrompt(prompt.parts[0].text, chatBot);
           }
-          console.log(chatHistory);
+          chatHistory.push({ parts: [{ text: reply }], role: "bot" });
+          setLoading(false);
+          setCanSubmit(true);
         }
       }
     })();
@@ -65,20 +103,42 @@ const Chat = ({
               msg.role === "user"
                 ? "bg-primary self-end max-w-[75%]"
                 : "self-start max-w-[90%]"
-            } px-3 py-1 rounded-3xl m-1  break-words`}
+            } px-3 py-1 rounded-3xl m-1 break-words`}
           >
-            {
-              msg.parts
-                .map((obj) => obj.text)
-                .join("") /* TODO: MARKUP -> TEXT (DOES NOT CONSIDER \n RN) */
-            }
+            <Markdown>{msg.parts.map((obj) => obj.text).join("")}</Markdown>
+            {/* TODO: CODE DOES NOT WRAP!!! */}
           </div>
         );
       })}
-      <div
-        ref={lastMessageRef}
-        className="self-start max-w-[90%] px-3 py-1 rounded-3xl m-1  break-words"
-      ></div>
+
+      <div className="flex">
+        {loading && (
+          <>
+            <IconContext.Provider
+              value={{
+                className: `ml-3 mr-0.5 my-1 animate-bounce [animation-delay:_0] [animation-timing-function:_ease]`,
+              }}
+            >
+              <SiGooglegemini />
+            </IconContext.Provider>
+            <IconContext.Provider
+              value={{
+                className: `mr-0.5 my-1 animate-bounce [animation-delay:_0.15s] [animation-timing-function:_ease]`,
+              }}
+            >
+              <SiGooglegemini />
+            </IconContext.Provider>
+            <IconContext.Provider
+              value={{
+                className: `my-1 animate-bounce [animation-delay:_0.3s] [animation-timing-function:_ease]`,
+              }}
+            >
+              <SiGooglegemini />
+            </IconContext.Provider>
+          </>
+        )}
+      </div>
+
       <div id="end-of-chat" className="py-4"></div>
     </div>
   );

@@ -2,20 +2,16 @@ import { useEffect } from "react";
 
 type typeBoxProps = {
   handleSubmit: () => void;
-  typeBoxRowSize: number | undefined;
   setTypeBoxRowSize: (size: number | undefined) => void;
-  disabledSubmitColor: string;
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
-  submitButtonRef: React.RefObject<HTMLButtonElement>;
+  onTypeBoxInput: (e: HTMLTextAreaElement) => void;
 };
 
 const TypeBox = ({
   handleSubmit,
-  typeBoxRowSize,
   setTypeBoxRowSize,
-  disabledSubmitColor,
   typeBoxRef,
-  submitButtonRef,
+  onTypeBoxInput,
 }: typeBoxProps) => {
   useEffect(() => {
     if (typeBoxRef.current) {
@@ -24,25 +20,11 @@ const TypeBox = ({
     }
   }, []);
 
-  const onInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    const textarea = e.currentTarget;
-    // console.log(typeBoxRowSize);
-    textarea.rows = 1;
-    const numRows = typeBoxRowSize ? textarea.scrollHeight / typeBoxRowSize : 1;
-    textarea.rows = numRows < 4 ? numRows : 4;
-    // console.log(textarea.scrollHeight, " ", textarea.rows);
-
-    const submitButton = submitButtonRef.current!.children[0] as HTMLElement;
-    textarea.textLength > 0
-      ? (submitButton.style.color = "white")
-      : (submitButton.style.color = disabledSubmitColor);
-  };
-
   const overrideEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSubmit();
-      onInput(e);
+      onTypeBoxInput(e.currentTarget as HTMLTextAreaElement);
     }
   };
 
@@ -53,7 +35,7 @@ const TypeBox = ({
         name="msg"
         placeholder="Message Einstein"
         className="flex-grow my-2 no-scrollbar resize-none bg-transparent focus:outline-none text-white"
-        onInput={onInput}
+        onInput={(e) => onTypeBoxInput(e.currentTarget as HTMLTextAreaElement)}
         onKeyDown={overrideEnter}
         rows={1}
       />

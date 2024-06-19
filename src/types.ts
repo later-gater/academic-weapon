@@ -1,4 +1,4 @@
 export type TMessage = {
-    parts: {text: string}[];
+    parts: {text: string, prompt?: string}[];
     role: string;
 };
