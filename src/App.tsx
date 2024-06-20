@@ -1,7 +1,7 @@
 import ChatBox from "./components/ChatBox";
 import Chat from "./components/Chat";
 import Header from "./components/Header";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChatSession,
   GoogleGenerativeAI,
@@ -9,6 +9,7 @@ import {
   HarmCategory,
 } from "@google/generative-ai";
 import { TMessage } from "./types";
+import QuickAction from "./components/QuickAction";
 
 const App = () => {
   const [canSubmit, setCanSubmit] = useState(true);
@@ -62,6 +63,7 @@ const App = () => {
 
   const [chatHistory, setChatHistory] = useState<TMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const typeBoxRef = useRef(null);
 
   // const logDev = () => {
   // };
@@ -70,7 +72,7 @@ const App = () => {
     <div className="flex flex-col h-screen">
       <Header />
       {/* <button onClick={logDev}>DEV</button> */}
-      <div className="w-full h-full bg-secondary flex flex-col justify-stretch items-center overflow-clip">
+      <div className="relative w-full h-full bg-secondary flex flex-col justify-stretch items-center overflow-clip">
         <Chat
           chatHistory={chatHistory ? chatHistory : []}
           chatBot={chatBot}
@@ -78,13 +80,18 @@ const App = () => {
           setLoading={setLoading}
           loading={loading}
         />
+        <div className="relative w-full h-0">
+          <QuickAction typeBoxRef={typeBoxRef} />
+        </div>
         <div className="w-full">
+          {/* TODO: Remove this div... */}
           <ChatBox
             setChatHistory={setChatHistory}
             initialText={initialText}
             chatHistory={chatHistory}
             canSubmit={canSubmit}
             loading={loading}
+            typeBoxRef={typeBoxRef}
           />
         </div>
       </div>

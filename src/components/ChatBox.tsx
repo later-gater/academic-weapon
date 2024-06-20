@@ -9,6 +9,7 @@ type chatBoxProps = {
   canSubmit: boolean;
   loading: boolean;
   initialText: string;
+  typeBoxRef: React.RefObject<HTMLTextAreaElement>;
 };
 
 const ChatBox = ({
@@ -17,10 +18,10 @@ const ChatBox = ({
   canSubmit,
   loading,
   initialText,
+  typeBoxRef,
 }: chatBoxProps) => {
   const disabledSubmitColor = "#676767";
   const [typeBoxRowSize, setTypeBoxRowSize] = useState<number | undefined>();
-  const typeBoxRef = useRef(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [submitDisabled, setSubmitDisabled] = useState(true);
 
@@ -39,7 +40,7 @@ const ChatBox = ({
         textarea.rows = 1;
       }
     }
-  };
+  }; //TODO: MOVE HANDLESUBMIT TO APP SO THAT QUICKACTION CAN ACCESS IT
 
   const onTypeBoxInput = (textarea: HTMLTextAreaElement) => {
     // console.log(typeBoxRowSize);
@@ -75,37 +76,39 @@ const ChatBox = ({
   }, [loading, submitDisabled]);
 
   return (
-    <div className="rounded-3xl pl-3 pr-2 mb-2 mx-5 flex items-end bg-primary justify-between">
-      <TypeBox
-        handleSubmit={handleSubmit}
-        setTypeBoxRowSize={setTypeBoxRowSize}
-        typeBoxRef={typeBoxRef}
-        onTypeBoxInput={onTypeBoxInput}
-      />
-      <button
-        type="submit"
-        ref={submitButtonRef}
-        onClick={handleSubmit}
-        className={`rounded-full ${loading && "hover:cursor-default"}`}
-        style={{
-          marginBottom: `${
-            (16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.15
-          }px`,
-        }}
-      >
-        {!loading ? (
-          <FaArrowAltCircleUp
-            size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
-          />
-        ) : (
-          <FaStopCircle
-            size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
-          />
-        )}
+    <>
+      <div className="relative rounded-3xl pl-3 pr-2 mb-2 mx-5 flex items-end bg-primary justify-between z-10">
+        <TypeBox
+          handleSubmit={handleSubmit}
+          setTypeBoxRowSize={setTypeBoxRowSize}
+          typeBoxRef={typeBoxRef}
+          onTypeBoxInput={onTypeBoxInput}
+        />
+        <button
+          type="submit"
+          ref={submitButtonRef}
+          onClick={handleSubmit}
+          className={`rounded-full ${loading && "hover:cursor-default"}`}
+          style={{
+            marginBottom: `${
+              (16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.15
+            }px`,
+          }}
+        >
+          {!loading ? (
+            <FaArrowAltCircleUp
+              size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
+            />
+          ) : (
+            <FaStopCircle
+              size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
+            />
+          )}
 
-        {/* TODO: maybe if loading make option to cancel??? */}
-      </button>
-    </div>
+          {/* TODO: maybe if loading make option to cancel??? */}
+        </button>
+      </div>
+    </>
   );
 };
 

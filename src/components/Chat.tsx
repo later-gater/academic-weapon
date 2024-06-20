@@ -92,7 +92,7 @@ const Chat = ({
   return (
     <div
       ref={scrollRef}
-      className="w-full flex h-full flex-col px-5 py-2 overflow-y-auto text-white scroll-smooth"
+      className="w-full flex h-full flex-col px-5 py-2 overflow-y-auto overflow-x-clip text-white scroll-smooth"
     >
       {/* TODO: MAKE PRETTY SCROLLBAR */}
       {chatHistory.map((msg, index) => {
@@ -105,7 +105,9 @@ const Chat = ({
                 : "self-start max-w-[90%]"
             } px-3 py-1 rounded-3xl m-1 break-words`}
           >
-            <Markdown>{msg.parts.map((obj) => obj.text).join("")}</Markdown>
+            <Markdown className="whitespace-pre-wrap break-words text-wrap overflow-x-auto">
+              {msg.parts.map((obj) => obj.text).join("")}
+            </Markdown>
             {/* TODO: CODE DOES NOT WRAP!!! */}
           </div>
         );
