@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Einstein Tutor",
+    "name": "Academic Weapon",
     "version": "1.0",
-    "description": "opens side panel einstein",
+    "description": "Facilitate Top-Down Learning",
     "minimum_chrome_version": "116",
     "background": {
       "service_worker": "service-worker.js",

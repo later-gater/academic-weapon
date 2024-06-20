@@ -5,13 +5,24 @@ type QAButtonProps = {
   beginText: string;
   isOpen: boolean;
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
+  handleSubmit: () => void;
 };
 
-const QAButton = ({ children, beginText, typeBoxRef }: QAButtonProps) => {
+const QAButton = ({
+  children,
+  beginText,
+  typeBoxRef,
+  handleSubmit,
+}: QAButtonProps) => {
   const onClick = () => {
     if (typeBoxRef.current) {
       const textarea = typeBoxRef.current as HTMLTextAreaElement;
-      textarea.value = `${beginText} "${textarea.value}"`;
+      if (textarea.value.length > 0) {
+        textarea.value = `${beginText}: "${textarea.value}"`;
+      } else {
+        textarea.value = `${beginText} it`;
+      }
+      handleSubmit();
     }
   };
   return (

@@ -1,12 +1,12 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "open-context",
-    title: "Open Einstein",
+    title: "Open Academic Weapon",
     contexts: ["page"],
   });
   chrome.contextMenus.create({
     id: "consult-context",
-    title: "Consult Einstein",
+    title: "Consult Academic Weapon",
     contexts: ["selection"],
   });
 });
@@ -36,6 +36,14 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       chrome.sidePanel.open({ windowId: tab.windowId });
       // console.log(info.selectionText);
       setStorage("consult-context", info.selectionText, tab);
+      (async () => {
+        try {
+          await chrome.runtime.sendMessage({ message: "new-consult" });
+          console.log("sent message!");
+        } catch (error) {
+          console.log(error);
+        }
+      })();
     }
   }
 });

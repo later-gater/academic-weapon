@@ -1,6 +1,6 @@
 import ChatBox from "./components/ChatBox";
 import Chat from "./components/Chat";
-import Header from "./components/Header";
+// import Header from "./components/Header";
 import { useEffect, useRef, useState } from "react";
 import {
   ChatSession,
@@ -29,6 +29,11 @@ const App = () => {
 
   const [chatBot, setChatBot] = useState<ChatSession>(model.startChat());
   const [initialText, setInitialText] = useState("");
+
+  const [chatHistory, setChatHistory] = useState<TMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const typeBoxRef = useRef(null);
+  const [typeBoxRowSize, setTypeBoxRowSize] = useState<number | undefined>();
 
   useEffect(() => {
     (async () => {
@@ -61,18 +66,51 @@ const App = () => {
     })();
   }, []);
 
-  const [chatHistory, setChatHistory] = useState<TMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const typeBoxRef = useRef(null);
+  chrome.runtime.onMessage.addListener((request) => {
+    console.log("recieved message!");
+    if (request.message === "new-consult") {
+      console.log("message is new-consult");
+      (async () => {
+        const { selectionText } = await chrome.storage.local.get([
+          "selectionText",
+        ]);
+        if (typeBoxRef.current) {
+          const textarea = typeBoxRef.current as HTMLTextAreaElement;
+          textarea.value += selectionText;
+          const numRows = typeBoxRowSize
+            ? textarea.scrollHeight / typeBoxRowSize
+            : 1;
+          textarea.rows = numRows < 4 ? numRows : 4;
+        }
+      })();
+    }
+  });
+
+  const handleSubmit = () => {
+    if (typeBoxRef.current) {
+      const textarea = typeBoxRef.current as HTMLTextAreaElement;
+      if (textarea.value.length > 0 && canSubmit) {
+        const msg = textarea.value;
+        // console.log(msg);
+        setChatHistory([
+          ...chatHistory,
+          { parts: [{ text: msg, prompt: msg }], role: "user" },
+        ]);
+        // console.log(chat);
+        textarea.value = "";
+        textarea.rows = 1;
+      }
+    }
+  }; //TODO: MOVE HANDLESUBMIT TO APP SO THAT QUICKACTION CAN ACCESS IT
 
   // const logDev = () => {
   // };
 
   return (
     <div className="flex flex-col h-screen">
-      <Header />
+      {/* <Header /> */}
       {/* <button onClick={logDev}>DEV</button> */}
-      <div className="relative w-full h-full bg-secondary flex flex-col justify-stretch items-center overflow-clip">
+      <div className="w-full h-full bg-secondary flex flex-col justify-stretch items-center overflow-clip">
         <Chat
           chatHistory={chatHistory ? chatHistory : []}
           chatBot={chatBot}
@@ -81,17 +119,16 @@ const App = () => {
           loading={loading}
         />
         <div className="relative w-full h-0">
-          <QuickAction typeBoxRef={typeBoxRef} />
+          <QuickAction typeBoxRef={typeBoxRef} handleSubmit={handleSubmit} />
         </div>
-        <div className="w-full">
-          {/* TODO: Remove this div... */}
+        <div className="w-full h-auto">
           <ChatBox
-            setChatHistory={setChatHistory}
+            typeBoxRowSize={typeBoxRowSize}
+            setTypeBoxRowSize={setTypeBoxRowSize}
             initialText={initialText}
-            chatHistory={chatHistory}
-            canSubmit={canSubmit}
             loading={loading}
             typeBoxRef={typeBoxRef}
+            handleSubmit={handleSubmit}
           />
         </div>
       </div>

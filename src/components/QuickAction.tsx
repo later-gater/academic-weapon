@@ -1,21 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import QAButton from "./QAButton.tsx";
 import { FaPlusCircle, FaMinusCircle } from "react-icons/fa";
 
 type QuickActionProps = {
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
+  handleSubmit: () => void;
 };
 
-const QuickAction = ({ typeBoxRef }: QuickActionProps) => {
+const QuickAction = ({ typeBoxRef, handleSubmit }: QuickActionProps) => {
   const [isOpen, setIsOpen] = useState(false);
   let qaButtonsRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    // if (typeBoxRef.current && qaButtonsRef.current) {
-    //   qaButtonsRef.current.style.bottom = `${
-    //     typeBoxRef.current.clientHeight + 30
-    //   }px`;
-    // }
-  }, [typeBoxRef.current?.value]);
+
   return (
     <div
       className={`flex left-4 items-center bg-transparent absolute bottom-2`}
@@ -41,29 +36,33 @@ const QuickAction = ({ typeBoxRef }: QuickActionProps) => {
       >
         <QAButton
           isOpen={isOpen}
-          beginText="Simplify: "
+          beginText="Simplify"
           typeBoxRef={typeBoxRef}
+          handleSubmit={handleSubmit}
         >
           Simplify
         </QAButton>
         <QAButton
           isOpen={isOpen}
-          beginText="Explain in detail: "
+          beginText="Explain what is"
           typeBoxRef={typeBoxRef}
+          handleSubmit={handleSubmit}
         >
           Explain
         </QAButton>
         <QAButton
           isOpen={isOpen}
-          beginText="Summarize: "
+          beginText="Summarize"
           typeBoxRef={typeBoxRef}
+          handleSubmit={handleSubmit}
         >
           Summary
         </QAButton>
         <QAButton
           isOpen={isOpen}
-          beginText="Create an analogy for: "
+          beginText="Create an analogy for"
           typeBoxRef={typeBoxRef}
+          handleSubmit={handleSubmit}
         >
           Analogy
         </QAButton>

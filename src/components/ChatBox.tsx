@@ -1,46 +1,29 @@
 import TypeBox from "./TypeBox";
 import { FaArrowAltCircleUp, FaStopCircle } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
-import { TMessage } from "../types";
 
 type chatBoxProps = {
-  chatHistory: TMessage[];
-  setChatHistory: (chatHistory: TMessage[]) => void;
-  canSubmit: boolean;
   loading: boolean;
   initialText: string;
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
+  handleSubmit: () => void;
+  typeBoxRowSize: number | undefined;
+  setTypeBoxRowSize: (size: number | undefined) => void;
 };
 
 const ChatBox = ({
-  chatHistory,
-  setChatHistory,
-  canSubmit,
   loading,
   initialText,
   typeBoxRef,
+  handleSubmit,
+  typeBoxRowSize,
+  setTypeBoxRowSize,
 }: chatBoxProps) => {
   const disabledSubmitColor = "#676767";
-  const [typeBoxRowSize, setTypeBoxRowSize] = useState<number | undefined>();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [submitDisabled, setSubmitDisabled] = useState(true);
 
-  const handleSubmit = () => {
-    if (typeBoxRef.current) {
-      const textarea = typeBoxRef.current as HTMLTextAreaElement;
-      if (textarea.value.length > 0 && canSubmit) {
-        const msg = textarea.value;
-        // console.log(msg);
-        setChatHistory([
-          ...chatHistory,
-          { parts: [{ text: msg, prompt: msg }], role: "user" },
-        ]);
-        // console.log(chat);
-        textarea.value = "";
-        textarea.rows = 1;
-      }
-    }
-  }; //TODO: MOVE HANDLESUBMIT TO APP SO THAT QUICKACTION CAN ACCESS IT
+
 
   const onTypeBoxInput = (textarea: HTMLTextAreaElement) => {
     // console.log(typeBoxRowSize);
@@ -77,7 +60,7 @@ const ChatBox = ({
 
   return (
     <>
-      <div className="relative rounded-3xl pl-3 pr-2 mb-2 mx-5 flex items-end bg-primary justify-between z-10">
+      <div className="rounded-3xl pl-3 pr-2 mb-2 mx-5 flex items-end bg-primary justify-between z-10">
         <TypeBox
           handleSubmit={handleSubmit}
           setTypeBoxRowSize={setTypeBoxRowSize}

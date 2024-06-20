@@ -33,7 +33,7 @@ const TypeBox = ({
       <textarea
         ref={typeBoxRef}
         name="msg"
-        placeholder="Message Einstein"
+        placeholder="Ask Academic Weapon"
         className="flex-grow my-2 no-scrollbar resize-none bg-transparent focus:outline-none text-white"
         onInput={(e) => onTypeBoxInput(e.currentTarget as HTMLTextAreaElement)}
         onKeyDown={overrideEnter}
