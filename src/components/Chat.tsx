@@ -92,9 +92,8 @@ const Chat = ({
   return (
     <div
       ref={scrollRef}
-      className="w-full flex h-full flex-col px-5 py-2 overflow-y-auto overflow-x-clip text-white scroll-smooth"
+      className="w-full flex h-full flex-col px-5 py-2 overflow-y-auto overflow-x-clip text-white scroll-smooth chat-scrollbar"
     >
-      {/* TODO: MAKE PRETTY SCROLLBAR */}
       {chatHistory.map((msg, index) => {
         return (
           <div
@@ -108,7 +107,6 @@ const Chat = ({
             <Markdown className="whitespace-pre-wrap break-words text-wrap overflow-x-auto">
               {msg.parts.map((obj) => obj.text).join("")}
             </Markdown>
-            {/* TODO: CODE DOES NOT WRAP!!! */}
           </div>
         );
       })}

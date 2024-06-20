@@ -101,7 +101,7 @@ const App = () => {
         textarea.rows = 1;
       }
     }
-  }; //TODO: MOVE HANDLESUBMIT TO APP SO THAT QUICKACTION CAN ACCESS IT
+  };
 
   // const logDev = () => {
   // };

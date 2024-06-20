@@ -3,15 +3,44 @@
 @tailwind utilities;
 
 @layer utilities {
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-   /* Hide scrollbar for IE, Edge and Firefox */
+    @supports selector(::-webkit-scrollbar) {
+        .chat-scrollbar::-webkit-scrollbar {
+          background: transparent;
+          width: 8px;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb {
+          background: #2f2f2f;
+          border-radius: 0.5rem;
+          transition-property: color;
+          transition-duration: 100ms;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #5f5f5f;
+            transition-property: color;
+            transition-duration: 100ms;
+          }
+
+        .tiny-scrollbar::-webkit-scrollbar {
+            background: transparent;
+            width: 4px;
+        }
+        .tiny-scrollbar::-webkit-scrollbar-thumb {
+            background: #212121;
+            border-radius: 0.5rem;
+            transition-property: color;
+            transition-duration: 100ms;
+        }
+        .tiny-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #5f5f5f;
+            transition-property: color;
+            transition-duration: 100ms;
+        }
+      }
+  /* Hide scrollbar for IE, Edge and Firefox */
     .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-  }
+       -ms-overflow-style: none;  /* IE and Edge */
+       scrollbar-width: none;  /* Firefox */
+ }
 
 }
 

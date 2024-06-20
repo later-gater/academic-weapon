@@ -34,7 +34,7 @@ const TypeBox = ({
         ref={typeBoxRef}
         name="msg"
         placeholder="Ask Academic Weapon"
-        className="flex-grow my-2 no-scrollbar resize-none bg-transparent focus:outline-none text-white"
+        className="flex-grow my-2 mr-1 tiny-scrollbar resize-none bg-transparent focus:outline-none text-white"
         onInput={(e) => onTypeBoxInput(e.currentTarget as HTMLTextAreaElement)}
         onKeyDown={overrideEnter}
         rows={1}
