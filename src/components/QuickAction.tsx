@@ -5,9 +5,14 @@ import { FaPlusCircle, FaMinusCircle } from "react-icons/fa";
 type QuickActionProps = {
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
   handleSubmit: () => void;
+  setSubmitDisabled: (disabled: boolean) => void;
 };
 
-const QuickAction = ({ typeBoxRef, handleSubmit }: QuickActionProps) => {
+const QuickAction = ({
+  typeBoxRef,
+  handleSubmit,
+  setSubmitDisabled,
+}: QuickActionProps) => {
   const [isOpen, setIsOpen] = useState(false);
   let qaButtonsRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +40,7 @@ const QuickAction = ({ typeBoxRef, handleSubmit }: QuickActionProps) => {
         }`}
       >
         <QAButton
+          setSubmitDisabled={setSubmitDisabled}
           isOpen={isOpen}
           beginText="Simplify"
           typeBoxRef={typeBoxRef}
@@ -43,14 +49,16 @@ const QuickAction = ({ typeBoxRef, handleSubmit }: QuickActionProps) => {
           Simplify
         </QAButton>
         <QAButton
+          setSubmitDisabled={setSubmitDisabled}
           isOpen={isOpen}
-          beginText="Explain what is"
+          beginText="Explain the meaning of"
           typeBoxRef={typeBoxRef}
           handleSubmit={handleSubmit}
         >
           Explain
         </QAButton>
         <QAButton
+          setSubmitDisabled={setSubmitDisabled}
           isOpen={isOpen}
           beginText="Summarize"
           typeBoxRef={typeBoxRef}
@@ -59,6 +67,7 @@ const QuickAction = ({ typeBoxRef, handleSubmit }: QuickActionProps) => {
           Summary
         </QAButton>
         <QAButton
+          setSubmitDisabled={setSubmitDisabled}
           isOpen={isOpen}
           beginText="Create an analogy for"
           typeBoxRef={typeBoxRef}

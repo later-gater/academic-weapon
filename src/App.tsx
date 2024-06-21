@@ -14,7 +14,11 @@ import QuickAction from "./components/QuickAction";
 const App = () => {
   const [canSubmit, setCanSubmit] = useState(true);
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // TODO: SET UP SYSTEM INSTRUCTIONS HERE https://github.com/google-gemini/cookbook/blob/main/quickstarts/System_instructions.ipynb
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction:
+      "You are a browser extension named Academic Weapon. Your goal is to help the user understand the article or website they are visiting. Make your responses reasonably short; if the user wants you to elaborate they will specify it.",
+  });
   const safetySettings = [
     {
       category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
@@ -33,7 +37,6 @@ const App = () => {
   const [chatHistory, setChatHistory] = useState<TMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const typeBoxRef = useRef(null);
-  const [typeBoxRowSize, setTypeBoxRowSize] = useState<number | undefined>();
 
   useEffect(() => {
     (async () => {
@@ -74,17 +77,25 @@ const App = () => {
         const { selectionText } = await chrome.storage.local.get([
           "selectionText",
         ]);
+        console.log("selectionText: ", selectionText);
         if (typeBoxRef.current) {
           const textarea = typeBoxRef.current as HTMLTextAreaElement;
-          textarea.value += selectionText;
-          const numRows = typeBoxRowSize
-            ? textarea.scrollHeight / typeBoxRowSize
-            : 1;
-          textarea.rows = numRows < 4 ? numRows : 4;
+          textarea.value = selectionText;
+          onChange();
         }
       })();
     }
   });
+
+  const [submitDisabled, setSubmitDisabled] = useState(true);
+
+  const onChange = () => {
+    if (typeBoxRef.current) {
+      const textarea = typeBoxRef.current as HTMLTextAreaElement;
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+  };
 
   const handleSubmit = () => {
     if (typeBoxRef.current) {
@@ -98,7 +109,7 @@ const App = () => {
         ]);
         // console.log(chat);
         textarea.value = "";
-        textarea.rows = 1;
+        onChange();
       }
     }
   };
@@ -119,12 +130,17 @@ const App = () => {
           loading={loading}
         />
         <div className="relative w-full h-0">
-          <QuickAction typeBoxRef={typeBoxRef} handleSubmit={handleSubmit} />
+          <QuickAction
+            typeBoxRef={typeBoxRef}
+            handleSubmit={handleSubmit}
+            setSubmitDisabled={setSubmitDisabled}
+          />
         </div>
         <div className="w-full h-auto">
           <ChatBox
-            typeBoxRowSize={typeBoxRowSize}
-            setTypeBoxRowSize={setTypeBoxRowSize}
+            onChange={onChange}
+            submitDisabled={submitDisabled}
+            setSubmitDisabled={setSubmitDisabled}
             initialText={initialText}
             loading={loading}
             typeBoxRef={typeBoxRef}

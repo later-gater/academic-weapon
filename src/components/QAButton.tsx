@@ -6,6 +6,7 @@ type QAButtonProps = {
   isOpen: boolean;
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
   handleSubmit: () => void;
+  setSubmitDisabled: (disabled: boolean) => void;
 };
 
 const QAButton = ({
@@ -13,6 +14,7 @@ const QAButton = ({
   beginText,
   typeBoxRef,
   handleSubmit,
+  setSubmitDisabled,
 }: QAButtonProps) => {
   const onClick = () => {
     if (typeBoxRef.current) {
@@ -23,6 +25,7 @@ const QAButton = ({
         textarea.value = `${beginText} it`;
       }
       handleSubmit();
+      setSubmitDisabled(true);
     }
   };
   return (

@@ -1,14 +1,15 @@
 import TypeBox from "./TypeBox";
 import { FaArrowAltCircleUp, FaStopCircle } from "react-icons/fa";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 type chatBoxProps = {
   loading: boolean;
   initialText: string;
   typeBoxRef: React.RefObject<HTMLTextAreaElement>;
   handleSubmit: () => void;
-  typeBoxRowSize: number | undefined;
-  setTypeBoxRowSize: (size: number | undefined) => void;
+  submitDisabled: boolean;
+  setSubmitDisabled: (disabled: boolean) => void;
+  onChange: () => void;
 };
 
 const ChatBox = ({
@@ -16,21 +17,15 @@ const ChatBox = ({
   initialText,
   typeBoxRef,
   handleSubmit,
-  typeBoxRowSize,
-  setTypeBoxRowSize,
+  submitDisabled,
+  setSubmitDisabled,
+  onChange,
 }: chatBoxProps) => {
   const disabledSubmitColor = "#676767";
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const [submitDisabled, setSubmitDisabled] = useState(true);
-
-
 
   const onTypeBoxInput = (textarea: HTMLTextAreaElement) => {
-    // console.log(typeBoxRowSize);
-    textarea.rows = 1;
-    const numRows = typeBoxRowSize ? textarea.scrollHeight / typeBoxRowSize : 1;
-    textarea.rows = numRows < 4 ? numRows : 4;
-    // console.log(textarea.scrollHeight, " ", textarea.rows);
+
 
     textarea.value.length > 0
       ? setSubmitDisabled(false)
@@ -47,7 +42,7 @@ const ChatBox = ({
 
   useEffect(() => {
     if (submitButtonRef.current) {
-      const icon = submitButtonRef.current.children[0] as HTMLElement;
+      const icon = submitButtonRef.current.children[0] as any;
       if (!loading && submitDisabled) {
         icon.style.color = disabledSubmitColor;
       } else if (!loading && !submitDisabled) {
@@ -60,10 +55,10 @@ const ChatBox = ({
 
   return (
     <>
-      <div className="rounded-3xl pl-3 pr-2 mb-2 mx-5 flex items-end bg-primary justify-between z-10">
+      <div className="rounded-3xl pl-3 pr-2 mb-2 mx-5 flex items-end bg-primary">
         <TypeBox
+        onChange={onChange}
           handleSubmit={handleSubmit}
-          setTypeBoxRowSize={setTypeBoxRowSize}
           typeBoxRef={typeBoxRef}
           onTypeBoxInput={onTypeBoxInput}
         />
@@ -71,22 +66,11 @@ const ChatBox = ({
           type="submit"
           ref={submitButtonRef}
           onClick={handleSubmit}
-          className={`rounded-full ${loading && "hover:cursor-default"}`}
-          style={{
-            marginBottom: `${
-              (16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.15
-            }px`,
-          }}
+          className={`rounded-full mb-1 h-6 w-6 ${
+            loading && "hover:cursor-default"
+          }`}
         >
-          {!loading ? (
-            <FaArrowAltCircleUp
-              size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
-            />
-          ) : (
-            <FaStopCircle
-              size={(16 + (typeBoxRowSize ? typeBoxRowSize : 0)) * 0.7}
-            />
-          )}
+          {!loading ? <FaArrowAltCircleUp size="1.5rem"/> : <FaStopCircle size="1.5rem"/>}
 
           {/* TODO: maybe if loading make option to cancel??? */}
         </button>

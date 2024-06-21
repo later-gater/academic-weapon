@@ -35,9 +35,10 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       console.log("consult-context called");
       chrome.sidePanel.open({ windowId: tab.windowId });
       // console.log(info.selectionText);
-      setStorage("consult-context", info.selectionText, tab);
+      
       (async () => {
         try {
+          await setStorage("consult-context", info.selectionText, tab);
           await chrome.runtime.sendMessage({ message: "new-consult" });
           console.log("sent message!");
         } catch (error) {
